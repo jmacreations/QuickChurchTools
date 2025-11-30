@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift m2M Categorisation Tool</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif; background:#f5f5f5; padding:20px; }
+        .container { max-width:1200px; margin:0 auto; background:white; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.1); }
+        .tabs { display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:2px solid #e0e0e0; padding:12px 20px; position:sticky; top:0; background:white; z-index:110; }
+        .tabs-left { display:flex; gap:0; }
+        .tabs-right { display:flex; align-items:center; }
+        .theme-toggle { display:flex; align-items:center; gap:8px; padding:8px 12px; background:#f5f5f5; border-radius:5px; font-size:14px; color:#333; }
+        .theme-toggle label { display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:500; }
+        .theme-toggle input[type=checkbox]{ cursor:pointer; }
+        .tab { padding:15px 30px; cursor:pointer; background:none; border:none; font-size:16px; font-weight:500; color:#666; transition:.3s; }
+        .tab:hover { background:#f5f5f5; }
+        .tab.active { color:#2196F3; border-bottom:3px solid #2196F3; margin-bottom:-2px; }
+        .tab-content { display:none;}
+        .tab-content.active { display:block; }
+        .header { position:sticky; top:75px; z-index:100; background:#ffffffcc; backdrop-filter:saturate(180%) blur(8px); border-bottom:1px solid #e6e6e6; padding:12px 20px; }
+        .header-inner { display:grid; grid-template-columns:1fr auto auto; gap:16px; align-items:center; }
+        .header-left { display:flex; flex-direction:column; gap:8px; }
+        .header-title { font-size:18px; font-weight:600; color:#1f2937; }
+        .progress-bar { width:100%; height:10px; background:#eee; border-radius:999px; overflow:hidden; position:relative; }
+        .progress-fill { height:100%; background:linear-gradient(90deg,#10b981,#22c55e); transition:width .3s ease; }
+        .progress-meta { font-size:12px; color:#6b7280; }
+        .controls { display:flex; gap:8px; flex-wrap:wrap; }
+        .btn { padding:8px 14px; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:500; transition:.3s; }
+        .btn-primary { background:#2563eb; color:#fff; }
+        .btn-primary:hover { background:#1d4ed8; }
+        .btn-danger { background:#ef4444; color:#fff; }
+        .btn-danger:hover { background:#dc2626; }
+        .btn-secondary { background:#6b7280; color:#fff; }
+        .btn-secondary:hover { background:#4b5563; }
+        .mode-toggle { display:flex; align-items:center; gap:10px; padding:8px 15px; background:#f5f5f5; border-radius:5px; font-size:14px; }
+        .mode-toggle label { display:flex; align-items:center; gap:5px; cursor:pointer; font-weight:500; }
+        .mode-toggle input[type=radio]{ cursor:pointer; }
+        input[type=file]{ display:none; }
+        .person-list { margin-top:0; }
+        .sort-header { display:grid; grid-template-columns:80px 150px 150px 120px 1fr; gap:15px; align-items:center; padding:12px 15px; background:#f9fafbcc; backdrop-filter:saturate(180%) blur(8px); border-bottom:1px solid #e6e6e6; font-weight:600; color:#374151; position:sticky; top:160px; z-index:99; }
+        .sort-btn { background:none; border:none; cursor:pointer; font-weight:600; font-size:13px; color:#6b7280; display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:6px; transition:.2s; text-align:left; justify-content:flex-start; }
+        .sort-btn:hover { background:#eef2ff; color:#1d4ed8; }
+        .sort-btn.active { color:#2563eb; }
+        .sort-arrow { font-size:12px; opacity:.5; }
+        .sort-btn.active .sort-arrow { opacity:1; }
+        .person-item { display:grid; grid-template-columns:80px 150px 150px 120px 1fr; gap:15px; align-items:center; padding:15px; border-bottom:1px solid #e0e0e0; transition:background .2s; }
+        .person-item:hover { background:#f9f9f9; }
+        .person-id { color:#999; font-size:14px; }
+        .person-firstname,.person-lastname,.person-category { font-size:16px; }
+        .person-firstname,.person-lastname { font-weight:500; }
+        .person-category { color:#666; font-size:14px; }
+        .category-buttons { display:flex; gap:8px; flex-wrap:wrap; }
+        .category-btn { padding:8px 16px; border:2px solid; border-radius:5px; cursor:pointer; font-size:14px; font-weight:500; transition:.3s; background:#fff; }
+        .category-btn:hover { transform:translateY(-2px); box-shadow:0 2px 4px rgba(0,0,0,.2); }
+        .category-btn.selected { color:#fff !important; }
+        .category-connect { border-color:#FF5722; color:#FF5722; } .category-connect.selected { background:#FF5722; }
+        .category-win { border-color:#2196F3; color:#2196F3; } .category-win.selected { background:#2196F3; }
+        .category-build { border-color:#4CAF50; color:#4CAF50; } .category-build.selected { background:#4CAF50; }
+        .category-train { border-color:#FF9800; color:#FF9800; } .category-train.selected { background:#FF9800; }
+        .category-sendmultiply { border-color:#9C27B0; color:#9C27B0; } .category-sendmultiply.selected { background:#9C27B0; }
+        .empty-state { text-align:center; padding:60px 20px; color:#999; }
+        .empty-state-icon { font-size:48px; margin-bottom:20px; }
+        .chart-container { margin-top:30px; padding:20px; }
+        .chart-bars { display:flex; flex-direction:column; gap:20px; margin-top:20px; }
+        .chart-bar-wrapper { display:flex; align-items:center; gap:15px; }
+        .chart-label { min-width:120px; font-weight:500; font-size:16px; }
+        .chart-bar-bg { flex:1; height:40px; background:#e0e0e0; border-radius:5px; overflow:hidden; position:relative; }
+        .chart-bar-fill { height:100%; transition:width .5s ease; display:flex; align-items:center; padding-left:10px; color:#fff; font-weight:bold; }
+        .chart-count { min-width:40px; text-align:right; font-weight:bold; font-size:18px; }
+        @media (max-width:768px){ .sort-header,.person-item{ grid-template-columns:1fr; gap:10px; } .sort-header{ top:140px; } .category-btn{ flex:1; min-width:80px; } }
+        /* Dark mode overrides */
+        body.dark { background:#0f172a; }
+        body.dark .container { background:#111827; box-shadow:0 2px 4px rgba(0,0,0,.5); }
+        body.dark .tabs { background:#111827; border-bottom:1px solid #334155; }
+        body.dark .tab { color:#cbd5e1; }
+        body.dark .tab:hover { background:#0b1220; }
+        body.dark .tab.active { color:#93c5fd; border-bottom-color:#93c5fd; }
+        body.dark .mode-toggle { background:#0b1220; color:#cbd5e1; }
+        body.dark .theme-toggle { background:#0b1220; color:#cbd5e1; }
+        body.dark .header { background:#0b1220cc; border-bottom:1px solid #334155; }
+        body.dark .header-title { color:#e5e7eb; }
+        body.dark .progress-bar { background:#1f2937; }
+        body.dark .progress-meta { color:#94a3b8; }
+        body.dark .sort-header { background:#0b1220cc; border-bottom:1px solid #334155; color:#cbd5e1; }
+        body.dark .sort-btn { color:#94a3b8; }
+        body.dark .sort-btn:hover { background:#0f172a; color:#93c5fd; }
+        body.dark .sort-btn.active { color:#93c5fd; }
+        body.dark .person-item { border-bottom:1px solid #334155; }
+        body.dark .person-item:hover { background:#0f172a; }
+        body.dark .person-id { color:#94a3b8; }
+        body.dark .person-firstname, body.dark .person-lastname, body.dark .person-category { color:#e5e7eb; }
+        body.dark .category-btn { background:#0b1220; }
+        body.dark .category-btn:hover { box-shadow:0 2px 4px rgba(0,0,0,.6); }
+        body.dark .empty-state { color:#9ca3af; }
+        body.dark .chart-container h2 { color:#e5e7eb; }
+        body.dark .chart-bar-bg { background:#1f2937; }
+        body.dark .chart-label { color:#e5e7eb; }
+        body.dark .chart-count { color:#e5e7eb; }
+        body.dark .csv-note { background:#3b3a1e !important; border-color:#525252 !important; color:#f1f5f9 !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <div class="tabs-left">
+                <button class="tab active" onclick="switchTab('categorise')">Categorise</button>
+                <button class="tab" onclick="switchTab('results')">Results</button>
+            </div>
+            <div class="tabs-right">
+                <div class="mode-toggle" style="margin-right:-4px;">
+                    <label><input type="radio" name="mode" value="single" checked onchange="changeMode('single')">People (Single)</label>
+                    <label><input type="radio" name="mode" value="multiple" onchange="changeMode('multiple')">Programs (Multiple)</label>
+                </div>
+                <div class="theme-toggle" style="margin-left:10px;">
+                    <label><input type="checkbox" id="theme-toggle" onchange="toggleTheme(this.checked)">Dark mode</label>
+                </div>
+            </div>
+        </div>
+        <div id="categorise-tab" class="tab-content active">
+            <div class="header">
+                <div class="header-inner">
+                    <div class="header-left">
+                        <div class="header-title">Categorise</div>
+                        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+                        <div class="progress-meta"><span id="progress-text"></span></div>
+                    </div>
+                    <div class="controls">
+                        <label for="csv-upload" class="btn btn-primary">Import CSV</label>
+                        <input type="file" id="csv-upload" accept=".csv" onchange="handleFileUpload(event)">
+                        <button class="btn btn-secondary" onclick="exportData()">Export Data</button>
+                        <button class="btn btn-danger" onclick="clearData()">Clear All Data</button>
+                    </div>
+                </div>
+            </div>
+            <div id="person-list" class="person-list"></div>
+            <div class="csv-note" style="padding:10px 20px; background:#fffbe6; border-top:1px solid #e0e0e0; border-bottom:1px solid #e0e0e0; font-size:13px; color:#5c5c00;">
+                <strong>CSV format:</strong> Required headers: <code>ID, Firstname, Lastname</code>. Optional: <code>Category</code>.<br>
+                In Programs (Multiple) mode, separate multiple categories with semicolons (e.g., <code>Connect; Build; Train</code>). Only these categories are recognised: <code>Connect</code>, <code>Win</code>, <code>Build</code>, <code>Train</code>, <code>Send/Multiply</code>.
+            </div>
+        </div>
+        <div id="results-tab" class="tab-content">
+            <div class="chart-container">
+                <h2>Category Distribution</h2>
+                <div class="csv-note" style="margin-top:10px; padding:10px 15px; background:#fffbe6; border:1px solid #e0e0e0; font-size:13px; color:#5c5c00; border-radius:4px;">
+                    <strong>CSV format:</strong> Required headers: <code>ID, Firstname, Lastname</code>. Optional: <code>Category</code>. Multiple values use semicolons.
+                </div>
+                <div class="chart-bars" id="chart-bars">
+                    <div class="chart-bar-wrapper"><div class="chart-label">Connect</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="background:#FF5722;width:0%;" id="bar-connect"></div></div><div class="chart-count" id="count-connect">0</div></div>
+                    <div class="chart-bar-wrapper"><div class="chart-label">Win</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="background:#2196F3;width:0%;" id="bar-win"></div></div><div class="chart-count" id="count-win">0</div></div>
+                    <div class="chart-bar-wrapper"><div class="chart-label">Build</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="background:#4CAF50;width:0%;" id="bar-build"></div></div><div class="chart-count" id="count-build">0</div></div>
+                    <div class="chart-bar-wrapper"><div class="chart-label">Train</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="background:#FF9800;width:0%;" id="bar-train"></div></div><div class="chart-count" id="count-train">0</div></div>
+                    <div class="chart-bar-wrapper"><div class="chart-label">Send/Multiply</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="background:#9C27B0;width:0%;" id="bar-send"></div></div><div class="chart-count" id="count-send">0</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const STORAGE_KEY='categorisation-data';
+        const MODE_KEY='categorisation-mode';
+        const THEME_KEY='categorisation-theme';
+        const CATEGORIES=['Connect','Win','Build','Train','Send/Multiply'];
+        let peopleData=[]; let sortField='lastname'; let sortDirection='asc'; let selectionMode='single';
+        function applyTheme(theme){const isDark=theme==='dark';document.body.classList.toggle('dark',isDark);const toggle=document.getElementById('theme-toggle');if(toggle)toggle.checked=isDark;}
+        function initTheme(){let theme=localStorage.getItem(THEME_KEY);if(!theme){theme=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}applyTheme(theme);}
+        function toggleTheme(on){const theme=on?'dark':'light';localStorage.setItem(THEME_KEY,theme);applyTheme(theme);}        
+        function changeMode(m){selectionMode=m;localStorage.setItem(MODE_KEY,m);renderPeopleList();}
+        function loadFromStorage(){const stored=localStorage.getItem(STORAGE_KEY);const storedMode=localStorage.getItem(MODE_KEY);if(storedMode){selectionMode=storedMode;document.querySelector(`input[value="${storedMode}"]`).checked=true;}if(stored){try{peopleData=JSON.parse(stored);renderPeopleList();updateProgress();updateChart();}catch(e){console.error('Error loading data:',e);}}}
+        function saveToStorage(){localStorage.setItem(STORAGE_KEY,JSON.stringify(peopleData));}
+        function handleFileUpload(ev){const file=ev.target.files[0];if(!file)return;const r=new FileReader();r.onload=e=>parseCSV(e.target.result);r.readAsText(file);ev.target.value='';}
+        function parseCSV(text){const lines=text.split('\n').filter(l=>l.trim());if(lines.length<2){alert('CSV file must contain headers and at least one data row');return;}const headers=lines[0].split(',').map(h=>h.trim().toLowerCase());const idIndex=headers.indexOf('id');const fnIndex=headers.indexOf('firstname');const lnIndex=headers.indexOf('lastname');const catIndex=headers.indexOf('category');if(idIndex===-1||fnIndex===-1||lnIndex===-1){alert('CSV must contain headers: ID, Firstname, Lastname');return;}peopleData=[];for(let i=1;i<lines.length;i++){const vals=lines[i].split(',').map(v=>v.trim());if(vals.length>=3){const person={id:vals[idIndex],firstname:vals[fnIndex],lastname:vals[lnIndex],category:selectionMode==='multiple'?[]:null};if(catIndex!==-1&&vals.length>catIndex){const raw=vals[catIndex];if(raw){const parsed=raw.split(';').map(v=>v.trim()).filter(Boolean);if(selectionMode==='multiple'){person.category=parsed.filter(c=>CATEGORIES.includes(c));}else{person.category=parsed.find(c=>CATEGORIES.includes(c))||null;}}}peopleData.push(person);}}saveToStorage();renderPeopleList();updateProgress();updateChart();}
+        function sortPeopleData(){const sorted=[...peopleData];sorted.sort((a,b)=>{let aVal,bVal;if(sortField==='id'){aVal=parseInt(a.id)||0;bVal=parseInt(b.id)||0;}else if(sortField==='category'){const order=['Connect','Win','Build','Train','Send/Multiply'];if(Array.isArray(a.category)){aVal=a.category.length>0?order.indexOf(a.category[0]):999;}else{aVal=a.category?order.indexOf(a.category):999;}if(Array.isArray(b.category)){bVal=b.category.length>0?order.indexOf(b.category[0]):999;}else{bVal=b.category?order.indexOf(b.category):999;}}else{aVal=(a[sortField]||'').toLowerCase();bVal=(b[sortField]||'').toLowerCase();}if(aVal<bVal)return sortDirection==='asc'?-1:1; if(aVal>bVal)return sortDirection==='asc'?1:-1; return 0;});return sorted;}
+        function toggleSort(f){if(sortField===f){sortDirection=sortDirection==='asc'?'desc':'asc';}else{sortField=f;sortDirection='asc';}renderPeopleList();}
+        function renderPeopleList(){const el=document.getElementById('person-list');if(peopleData.length===0){el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">📋</div><h3>No data loaded</h3><p>Import a CSV file to get started</p></div>`;return;}const sorted=sortPeopleData();const arrow=sortDirection==='asc'?'↑':'↓';el.innerHTML=`<div class="sort-header"><button class="sort-btn ${sortField==='id'?'active':''}" onclick="toggleSort('id')">ID <span class="sort-arrow">${sortField==='id'?arrow:'↕'}</span></button><button class="sort-btn ${sortField==='firstname'?'active':''}" onclick="toggleSort('firstname')">First Name <span class="sort-arrow">${sortField==='firstname'?arrow:'↕'}</span></button><button class="sort-btn ${sortField==='lastname'?'active':''}" onclick="toggleSort('lastname')">Last Name <span class="sort-arrow">${sortField==='lastname'?arrow:'↕'}</span></button><button class="sort-btn ${sortField==='category'?'active':''}" onclick="toggleSort('category')">Category <span class="sort-arrow">${sortField==='category'?arrow:'↕'}</span></button><div></div></div>`+sorted.map(p=>{const idx=peopleData.indexOf(p);return `<div class="person-item"><div class="person-id">#${p.id}</div><div class="person-firstname">${p.firstname}</div><div class="person-lastname">${p.lastname}</div><div class="person-category">${Array.isArray(p.category)?(p.category.length>0?p.category.join(', '):'-'):(p.category||'-')}</div><div class="category-buttons">${CATEGORIES.map(cat=>{const sel=Array.isArray(p.category)?p.category.includes(cat):p.category===cat;return `<button class="category-btn category-${cat.toLowerCase().replace('/','')} ${sel?'selected':''}" onclick="setCategory(${idx},'${cat}')">${cat}</button>`}).join('')}</div></div>`}).join('');}
+        function setCategory(i,cat){if(selectionMode==='multiple'){if(!Array.isArray(peopleData[i].category))peopleData[i].category=[];const pos=peopleData[i].category.indexOf(cat);if(pos>-1){peopleData[i].category.splice(pos,1);}else{peopleData[i].category.push(cat);}}else{if(peopleData[i].category===cat){peopleData[i].category=null;}else{peopleData[i].category=cat;}}saveToStorage();renderPeopleList();updateProgress();updateChart();}
+        function updateProgress(){const categorised=peopleData.filter(p=>Array.isArray(p.category)?p.category.length>0:p.category!==null).length;const total=peopleData.length;const pct=total>0?(categorised/total)*100:0;document.getElementById('progress-fill').style.width=pct+'%';document.getElementById('progress-text').textContent=`${categorised} / ${total} (${Math.round(pct)}%)`;}
+        function updateChart(){const counts={'Connect':0,'Win':0,'Build':0,'Train':0,'Send/Multiply':0};peopleData.forEach(p=>{if(Array.isArray(p.category)){p.category.forEach(c=>{if(counts[c]!==undefined)counts[c]++;});}else if(p.category&&counts[p.category]!==undefined){counts[p.category]++;}});const max=Math.max(...Object.values(counts),1);Object.keys(counts).forEach(cat=>{const bar=document.getElementById('bar-'+cat.toLowerCase().replace('/',''));const countEl=document.getElementById('count-'+cat.toLowerCase().replace('/',''));const pct=(counts[cat]/max)*100;bar.style.width=pct+'%';bar.textContent=counts[cat]>0?counts[cat]:'';countEl.textContent=counts[cat];});}
+        function switchTab(name){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));event.target.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById(name+'-tab').classList.add('active');if(name==='results')updateChart();}
+        function clearData(){if(confirm('Are you sure you want to clear all data? This cannot be undone.')){peopleData=[];localStorage.removeItem(STORAGE_KEY);renderPeopleList();updateProgress();updateChart();}}
+        function exportData(){if(peopleData.length===0){alert('No data to export');return;}let csv='ID,Firstname,Lastname,Category\n';peopleData.forEach(p=>{const cStr=Array.isArray(p.category)?p.category.join('; '):(p.category||'');csv+=`${p.id},${p.firstname},${p.lastname},${cStr}\n`;});const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='categorised-people-'+new Date().toISOString().split('T')[0]+'.csv';a.click();URL.revokeObjectURL(url);}initTheme();loadFromStorage();
+    </script>
+</body>
+</html>
