@@ -45,24 +45,24 @@
         .btn-secondary { background:#6b7280; color:#fff; }
         .btn-secondary:hover { background:#4b5563; }
         /* Mode Switch */
-        .mode-switch-wrapper { display:inline-grid; grid-template-columns:1fr 1fr; background:#f5f5f5; padding:4px; border-radius:8px; position:relative; margin-right:10px; }
-        .mode-switch-wrapper input { display:none; }
-        .mode-label { padding:6px 16px; cursor:pointer; text-align:center; z-index:2; font-size:14px; font-weight:500; color:#666; transition:color .3s; }
-        .mode-switch-wrapper input:checked + label { color:#2563eb; }
-        .mode-slider { position:absolute; top:4px; bottom:4px; left:4px; width:calc(50% - 4px); background:white; border-radius:6px; transition:transform .3s ease; z-index:1; box-shadow:0 1px 2px rgba(0,0,0,.1); }
-        #mode-multiple:checked ~ .mode-slider { transform:translateX(100%); }
+        .list-switch-wrapper { display:inline-grid; grid-template-columns:1fr 1fr; background:#f5f5f5; padding:4px; border-radius:8px; position:relative; margin-right:10px; }
+        .list-switch-wrapper input { display:none; }
+        .list-label { padding:6px 16px; cursor:pointer; text-align:center; z-index:2; font-size:14px; font-weight:500; color:#666; transition:color .3s; }
+        .list-switch-wrapper input:checked + label { color:#2563eb; }
+        .list-slider { position:absolute; top:4px; bottom:4px; left:4px; width:calc(50% - 4px); background:white; border-radius:6px; transition:transform .3s ease; z-index:1; box-shadow:0 1px 2px rgba(0,0,0,.1); }
+        #list-programs:checked ~ .list-slider { transform:translateX(100%); }
         
         input[type=file]{ display:none; }
         .person-list { margin-top:0; }
-        .sort-header { display:grid; grid-template-columns:80px 150px 150px 120px 1fr; gap:15px; align-items:center; padding:12px 15px; background:#f9fafbbb; backdrop-filter:saturate(180%) blur(8px); border-bottom:1px solid #e6e6e6; font-weight:600; color:#374151; position:sticky; top:125px; z-index:99; }
+        .sort-header { display:grid; grid-template-columns:150px 150px 120px 1fr; gap:15px; align-items:center; padding:12px 15px; background:#f9fafbbb; backdrop-filter:saturate(180%) blur(8px); border-bottom:1px solid #e6e6e6; font-weight:600; color:#374151; position:sticky; top:125px; z-index:99; }
         .sort-btn { background:none; border:none; cursor:pointer; font-weight:600; font-size:13px; color:#6b7280; display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:6px; transition:.2s; text-align:left; justify-content:flex-start; }
         .sort-btn:hover { background:#eef2ff; color:#1d4ed8; }
         .sort-btn.active { color:#2563eb; }
         .sort-arrow { font-size:12px; opacity:.5; }
         .sort-btn.active .sort-arrow { opacity:1; }
-        .person-item { display:grid; grid-template-columns:80px 150px 150px 120px 1fr; gap:15px; align-items:center; padding:15px; border-bottom:1px solid #e0e0e0; transition:background .2s; }
+        .person-item { display:grid; grid-template-columns:150px 150px 120px 1fr; gap:15px; align-items:center; padding:15px; border-bottom:1px solid #e0e0e0; transition:background .2s; }
         .person-item:hover { background:#f9f9f9; }
-        .person-id { color:#999; font-size:14px; }
+        .person-id { color:#999; font-size:14px; display:none; }
         .person-firstname,.person-lastname,.person-category { font-size:16px; }
         .person-firstname,.person-lastname { font-weight:500; }
         .person-category { color:#666; font-size:14px; }
@@ -84,7 +84,12 @@
         .chart-bar-bg { flex:1; height:40px; background:#e0e0e0; border-radius:5px; overflow:hidden; position:relative; }
         .chart-bar-fill { height:100%; transition:width .5s ease; display:flex; align-items:center; padding-left:10px; color:#fff; font-weight:bold; }
         .chart-count { min-width:40px; text-align:right; font-weight:bold; font-size:18px; }
-        @media (max-width:768px){ .sort-header,.person-item{ grid-template-columns:1fr; gap:10px; } .sort-header{ top:120px; } .category-btn{ flex:1; min-width:80px; } }
+        @media (max-width:768px){ 
+            .sort-header,.person-item{ grid-template-columns:1fr !important; gap:10px; } 
+            .sort-header{ top:120px; } 
+            .category-btn{ flex:1; min-width:80px; } 
+            .chart-grid { grid-template-columns: 1fr !important; }
+        }
         /* Dark mode overrides */
         body.dark { background:#0f172a; }
         body.dark .container { background:#111827; box-shadow:0 2px 4px rgba(0,0,0,.5); }
@@ -93,10 +98,10 @@
         body.dark .tabs-slider { background:#1f2937; }
         body.dark .tab-label { color:#94a3b8; }
         body.dark .tabs-switch-wrapper input:checked + label { color:#e5e7eb; }
-        body.dark .mode-switch-wrapper { background:#0b1220; }
-        body.dark .mode-slider { background:#1f2937; }
-        body.dark .mode-label { color:#94a3b8; }
-        body.dark .mode-switch-wrapper input:checked + label { color:#e5e7eb; }
+        body.dark .list-switch-wrapper { background:#0b1220; }
+        body.dark .list-slider { background:#1f2937; }
+        body.dark .list-label { color:#94a3b8; }
+        body.dark .list-switch-wrapper input:checked + label { color:#e5e7eb; }
         body.dark .theme-switch-wrapper { background:#0b1220; }
         body.dark .theme-slider { background:#1f2937; }
         body.dark .theme-label { color:#94a3b8; }
@@ -154,12 +159,12 @@
                 <div class="tabs-slider"></div>
             </div>
             <div class="tabs-right">
-                <div class="mode-switch-wrapper">
-                    <input type="radio" name="mode" id="mode-single" value="single" checked onchange="changeMode('single')">
-                    <label for="mode-single" class="mode-label">People (Single)</label>
-                    <input type="radio" name="mode" id="mode-multiple" value="multiple" onchange="changeMode('multiple')">
-                    <label for="mode-multiple" class="mode-label">Programs (Multiple)</label>
-                    <div class="mode-slider"></div>
+                <div class="list-switch-wrapper">
+                    <input type="radio" name="list-type" id="list-people" value="people" checked onchange="switchList('people')">
+                    <label for="list-people" class="list-label">People</label>
+                    <input type="radio" name="list-type" id="list-programs" value="programs" onchange="switchList('programs')">
+                    <label for="list-programs" class="list-label">Programs</label>
+                    <div class="list-slider"></div>
                 </div>
                 <div class="theme-switch-wrapper">
                     <input type="radio" name="theme" id="theme-light" value="light" checked onchange="toggleTheme(false)">
@@ -196,14 +201,21 @@
             <div class="chart-container">
                 <h2>Category Distribution</h2>
                 <div class="csv-note" style="margin-top:10px; padding:10px 15px; background:#fffbe6; border:1px solid #e0e0e0; font-size:13px; color:#5c5c00; border-radius:4px;">
-                    <strong>CSV format:</strong> Required headers: <code>ID, Firstname, Lastname</code>. Optional: <code>Category</code>. Multiple values use semicolons.
+                    <strong>Comparison:</strong> Showing distribution for both People and Programs.
                 </div>
-                <div class="chart-bars" id="chart-bars">
-                    <div class="chart-bar-wrapper"><div class="chart-label">Connect</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="background:#FF5722;width:0%;" id="bar-connect"></div></div><div class="chart-count" id="count-connect">0</div></div>
-                    <div class="chart-bar-wrapper"><div class="chart-label">Win</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="background:#2196F3;width:0%;" id="bar-win"></div></div><div class="chart-count" id="count-win">0</div></div>
-                    <div class="chart-bar-wrapper"><div class="chart-label">Build</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="background:#4CAF50;width:0%;" id="bar-build"></div></div><div class="chart-count" id="count-build">0</div></div>
-                    <div class="chart-bar-wrapper"><div class="chart-label">Train</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="background:#FF9800;width:0%;" id="bar-train"></div></div><div class="chart-count" id="count-train">0</div></div>
-                    <div class="chart-bar-wrapper"><div class="chart-label">Send/Multiply</div><div class="chart-bar-bg"><div class="chart-bar-fill" style="background:#9C27B0;width:0%;" id="bar-sendmultiply"></div></div><div class="chart-count" id="count-sendmultiply">0</div></div>
+                <div class="chart-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:20px;">
+                    <div>
+                        <h3 style="margin-bottom:15px; color:#666;">People</h3>
+                        <div class="chart-bars" id="chart-bars-people">
+                            <!-- Bars generated by JS -->
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom:15px; color:#666;">Programs</h3>
+                        <div class="chart-bars" id="chart-bars-programs">
+                            <!-- Bars generated by JS -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -252,27 +264,245 @@
     </div>
     <script>
         const STORAGE_KEY='categorisation-data';
-        const MODE_KEY='categorisation-mode';
+        const MODE_KEY='categorisation-active-list';
         const THEME_KEY='categorisation-theme';
         const CATEGORIES=['Connect','Win','Build','Train','Send/Multiply'];
-        let peopleData=[]; let sortField='lastname'; let sortDirection='asc'; let selectionMode='single';
+        let appData = { people: [], programs: [] };
+        let sortField='lastname'; let sortDirection='asc'; let activeList='people';
         function applyTheme(theme){const isDark=theme==='dark';document.body.classList.toggle('dark',isDark);if(isDark){document.getElementById('theme-dark').checked=true;}else{document.getElementById('theme-light').checked=true;}}
         function initTheme(){let theme=localStorage.getItem(THEME_KEY);if(!theme){theme=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}applyTheme(theme);if(window.matchMedia){window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',e=>{if(!localStorage.getItem(THEME_KEY)){applyTheme(e.matches?'dark':'light');}});}}
         function toggleTheme(on){const theme=on?'dark':'light';localStorage.setItem(THEME_KEY,theme);applyTheme(theme);}        
-        function changeMode(m){selectionMode=m;localStorage.setItem(MODE_KEY,m);renderPeopleList();}
-        function loadFromStorage(){const stored=localStorage.getItem(STORAGE_KEY);const storedMode=localStorage.getItem(MODE_KEY);if(storedMode){selectionMode=storedMode;document.querySelector(`input[value="${storedMode}"]`).checked=true;}if(stored){try{peopleData=JSON.parse(stored);renderPeopleList();updateProgress();updateChart();}catch(e){console.error('Error loading data:',e);}}}
-        function saveToStorage(){localStorage.setItem(STORAGE_KEY,JSON.stringify(peopleData));}
+        function switchList(listType){activeList=listType;localStorage.setItem(MODE_KEY,listType);renderPeopleList();updateProgress();}
+        function loadFromStorage(){
+            const stored = localStorage.getItem(STORAGE_KEY);
+            const storedMode = localStorage.getItem(MODE_KEY);
+            if(storedMode){
+                activeList = storedMode;
+                document.querySelector(`input[name="list-type"][value="${storedMode}"]`).checked=true;
+            }
+            if(stored){
+                try{
+                    const parsedData = JSON.parse(stored);
+                    // Handle migration from old array format if necessary
+                    if(Array.isArray(parsedData)){
+                        appData.people = [];
+                        appData.programs = [];
+                    } else {
+                        appData.people = parsedData.people || [];
+                        appData.programs = parsedData.programs || [];
+                    }
+                } catch(e) {
+                    console.error('Error loading data:',e);
+                    appData = { people: [], programs: [] };
+                }
+            }
+            renderPeopleList();
+            updateProgress();
+            updateChart();
+        }
+        function saveToStorage(){localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));}
         function handleFileUpload(ev){const file=ev.target.files[0];if(!file)return;const r=new FileReader();r.onload=e=>parseCSV(e.target.result);r.readAsText(file);ev.target.value='';}
-        function parseCSV(text){text=text.replace(/^\uFEFF/, '');const lines=text.split(/\r\n|\n|\r/).filter(l=>l.trim());if(lines.length<2){alert('CSV file must contain headers and at least one data row');return;}const headers=lines[0].split(',').map(h=>h.trim().toLowerCase());const idIndex=headers.indexOf('id');const fnIndex=headers.indexOf('firstname');const lnIndex=headers.indexOf('lastname');const catIndex=headers.indexOf('category');if(idIndex===-1||fnIndex===-1||lnIndex===-1){alert('CSV must contain headers: ID, Firstname, Lastname');return;}peopleData=[];for(let i=1;i<lines.length;i++){const vals=lines[i].split(',').map(v=>v.trim());if(vals.length>=3){const person={id:vals[idIndex]||'',firstname:vals[fnIndex]||'',lastname:vals[lnIndex]||'',category:selectionMode==='multiple'?[]:null};if(catIndex!==-1&&vals.length>catIndex){const raw=vals[catIndex];if(raw){const parsed=raw.split(';').map(v=>v.trim()).filter(Boolean);if(selectionMode==='multiple'){person.category=parsed.filter(c=>CATEGORIES.includes(c));}else{person.category=parsed.find(c=>CATEGORIES.includes(c))||null;}}}peopleData.push(person);}}saveToStorage();renderPeopleList();updateProgress();updateChart();}
-        function sortPeopleData(){const sorted=[...peopleData];sorted.sort((a,b)=>{let aVal,bVal;if(sortField==='id'){aVal=parseInt(a.id)||0;bVal=parseInt(b.id)||0;}else if(sortField==='category'){const order=['Connect','Win','Build','Train','Send/Multiply'];if(Array.isArray(a.category)){aVal=a.category.length>0?order.indexOf(a.category[0]):999;}else{aVal=a.category?order.indexOf(a.category):999;}if(Array.isArray(b.category)){bVal=b.category.length>0?order.indexOf(b.category[0]):999;}else{bVal=b.category?order.indexOf(b.category):999;}}else{aVal=(a[sortField]||'').toLowerCase();bVal=(b[sortField]||'').toLowerCase();}if(aVal<bVal)return sortDirection==='asc'?-1:1; if(aVal>bVal)return sortDirection==='asc'?1:-1; return 0;});return sorted;}
+        function parseCSV(text){
+            text=text.replace(/^\uFEFF/, '');
+            const lines=text.split(/\r\n|\n|\r/).filter(l=>l.trim());
+            if(lines.length<2){alert('CSV file must contain headers and at least one data row');return;}
+            const headers=lines[0].split(',').map(h=>h.trim().toLowerCase());
+            const idIndex=headers.indexOf('id');
+            const fnIndex=headers.indexOf('firstname');
+            const lnIndex=headers.indexOf('lastname');
+            const catIndex=headers.indexOf('category');
+            
+            if(activeList === 'people' && (idIndex===-1||fnIndex===-1||lnIndex===-1)){
+                alert('CSV for People must contain headers: ID, Firstname, Lastname');return;
+            }
+            if(activeList === 'programs' && (idIndex===-1||fnIndex===-1)){
+                alert('CSV for Programs must contain headers: ID, Firstname (use for Program Name)');return;
+            }
+
+            const newList=[];
+            for(let i=1;i<lines.length;i++){
+                const vals=lines[i].split(',').map(v=>v.trim());
+                if(vals.length>=2){ // At least ID and Name
+                    const item={
+                        id:vals[idIndex]||'',
+                        firstname:vals[fnIndex]||'',
+                        lastname:activeList==='people'?(vals[lnIndex]||''):'',
+                        category:activeList==='programs'?[]:null
+                    };
+                    if(catIndex!==-1&&vals.length>catIndex){
+                        const raw=vals[catIndex];
+                        if(raw){
+                            const parsed=raw.split(';').map(v=>v.trim()).filter(Boolean);
+                            if(activeList==='programs'){
+                                item.category=parsed.filter(c=>CATEGORIES.includes(c));
+                            }else{
+                                item.category=parsed.find(c=>CATEGORIES.includes(c))||null;
+                            }
+                        }
+                    }
+                    newList.push(item);
+                }
+            }
+            appData[activeList] = newList;
+            saveToStorage();
+            renderPeopleList();
+            updateProgress();
+            updateChart();
+        }
+        function sortPeopleData(){
+            const list = appData[activeList];
+            const sorted=[...list];
+            sorted.sort((a,b)=>{
+                let aVal,bVal;
+                if(sortField==='id'){
+                    aVal=parseInt(a.id)||0;bVal=parseInt(b.id)||0;
+                }else if(sortField==='category'){
+                    const order=['Connect','Win','Build','Train','Send/Multiply'];
+                    if(Array.isArray(a.category)){aVal=a.category.length>0?order.indexOf(a.category[0]):999;}else{aVal=a.category?order.indexOf(a.category):999;}
+                    if(Array.isArray(b.category)){bVal=b.category.length>0?order.indexOf(b.category[0]):999;}else{bVal=b.category?order.indexOf(b.category):999;}
+                }else{
+                    aVal=(a[sortField]||'').toLowerCase();bVal=(b[sortField]||'').toLowerCase();
+                }
+                if(aVal<bVal)return sortDirection==='asc'?-1:1; 
+                if(aVal>bVal)return sortDirection==='asc'?1:-1; 
+                return 0;
+            });
+            return sorted;
+        }
         function toggleSort(f){if(sortField===f){sortDirection=sortDirection==='asc'?'desc':'asc';}else{sortField=f;sortDirection='asc';}renderPeopleList();}
-        function renderPeopleList(){const el=document.getElementById('person-list');if(peopleData.length===0){el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">📋</div><h3>No data loaded</h3><p>Import a CSV file to get started</p></div>`;return;}const sorted=sortPeopleData();const arrow=sortDirection==='asc'?'↑':'↓';el.innerHTML=`<div class="sort-header"><button class="sort-btn ${sortField==='id'?'active':''}" onclick="toggleSort('id')">ID <span class="sort-arrow">${sortField==='id'?arrow:'↕'}</span></button><button class="sort-btn ${sortField==='firstname'?'active':''}" onclick="toggleSort('firstname')">First Name <span class="sort-arrow">${sortField==='firstname'?arrow:'↕'}</span></button><button class="sort-btn ${sortField==='lastname'?'active':''}" onclick="toggleSort('lastname')">Last Name <span class="sort-arrow">${sortField==='lastname'?arrow:'↕'}</span></button><button class="sort-btn ${sortField==='category'?'active':''}" onclick="toggleSort('category')">Category <span class="sort-arrow">${sortField==='category'?arrow:'↕'}</span></button><div></div></div>`+sorted.map(p=>{const idx=peopleData.indexOf(p);return `<div class="person-item"><div class="person-id">#${p.id}</div><div class="person-firstname">${p.firstname}</div><div class="person-lastname">${p.lastname}</div><div class="person-category">${Array.isArray(p.category)?(p.category.length>0?p.category.join(', '):'-'):(p.category||'-')}</div><div class="category-buttons">${CATEGORIES.map(cat=>{const sel=Array.isArray(p.category)?p.category.includes(cat):p.category===cat;return `<button class="category-btn category-${cat.toLowerCase().replace('/','')} ${sel?'selected':''}" onclick="setCategory(${idx},'${cat}')">${cat}</button>`}).join('')}</div></div>`}).join('');}
-        function setCategory(i,cat){if(selectionMode==='multiple'){if(!Array.isArray(peopleData[i].category))peopleData[i].category=[];const pos=peopleData[i].category.indexOf(cat);if(pos>-1){peopleData[i].category.splice(pos,1);}else{peopleData[i].category.push(cat);}}else{if(peopleData[i].category===cat){peopleData[i].category=null;}else{peopleData[i].category=cat;}}saveToStorage();renderPeopleList();updateProgress();updateChart();}
-        function updateProgress(){const categorised=peopleData.filter(p=>Array.isArray(p.category)?p.category.length>0:p.category!==null).length;const total=peopleData.length;const pct=total>0?(categorised/total)*100:0;document.getElementById('progress-fill').style.width=pct+'%';document.getElementById('progress-text').textContent=`${categorised} / ${total} (${Math.round(pct)}%)`;}
-        function updateChart(){const counts={'Connect':0,'Win':0,'Build':0,'Train':0,'Send/Multiply':0};peopleData.forEach(p=>{if(Array.isArray(p.category)){p.category.forEach(c=>{if(counts[c]!==undefined)counts[c]++;});}else if(p.category&&counts[p.category]!==undefined){counts[p.category]++;}});const max=Math.max(...Object.values(counts),1);Object.keys(counts).forEach(cat=>{const bar=document.getElementById('bar-'+cat.toLowerCase().replace('/',''));const countEl=document.getElementById('count-'+cat.toLowerCase().replace('/',''));const pct=(counts[cat]/max)*100;bar.style.width=pct+'%';bar.textContent=counts[cat]>0?counts[cat]:'';countEl.textContent=counts[cat];});}
-        function switchTab(name){document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));document.getElementById(name+'-tab').classList.add('active');if(name==='results')updateChart();}
-        function clearData(){if(confirm('Are you sure you want to clear all data? This cannot be undone.')){peopleData=[];localStorage.removeItem(STORAGE_KEY);renderPeopleList();updateProgress();updateChart();}}
-        function exportData(){if(peopleData.length===0){alert('No data to export');return;}let csv='ID,Firstname,Lastname,Category\n';peopleData.forEach(p=>{const cStr=Array.isArray(p.category)?p.category.join('; '):(p.category||'');csv+=`${p.id},${p.firstname},${p.lastname},${cStr}\n`;});const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='categorised-people-'+new Date().toISOString().split('T')[0]+'.csv';a.click();URL.revokeObjectURL(url);}initTheme();loadFromStorage();
+        function renderPeopleList(){
+            const el=document.getElementById('person-list');
+            const list = appData[activeList];
+            if(list.length===0){
+                el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">📋</div><h3>No ${activeList} loaded</h3><p>Import a CSV file to get started</p></div>`;
+                return;
+            }
+            const sorted=sortPeopleData();
+            const arrow=sortDirection==='asc'?'↑':'↓';
+            
+            let headerHTML = '';
+            if(activeList === 'people'){
+                headerHTML = `<div class="sort-header">
+                    <button class="sort-btn ${sortField==='firstname'?'active':''}" onclick="toggleSort('firstname')">First Name <span class="sort-arrow">${sortField==='firstname'?arrow:'↕'}</span></button>
+                    <button class="sort-btn ${sortField==='lastname'?'active':''}" onclick="toggleSort('lastname')">Last Name <span class="sort-arrow">${sortField==='lastname'?arrow:'↕'}</span></button>
+                    <button class="sort-btn ${sortField==='category'?'active':''}" onclick="toggleSort('category')">Category <span class="sort-arrow">${sortField==='category'?arrow:'↕'}</span></button>
+                    <div></div>
+                </div>`;
+            } else {
+                headerHTML = `<div class="sort-header" style="grid-template-columns:1fr 120px 1fr;">
+                    <button class="sort-btn ${sortField==='firstname'?'active':''}" onclick="toggleSort('firstname')">Program Name <span class="sort-arrow">${sortField==='firstname'?arrow:'↕'}</span></button>
+                    <button class="sort-btn ${sortField==='category'?'active':''}" onclick="toggleSort('category')">Category <span class="sort-arrow">${sortField==='category'?arrow:'↕'}</span></button>
+                    <div></div>
+                </div>`;
+            }
+
+            el.innerHTML= headerHTML + sorted.map(p=>{
+                const idx=list.indexOf(p);
+                let rowHTML = '';
+                if(activeList === 'people'){
+                    rowHTML = `<div class="person-item">
+                        <div class="person-firstname" title="ID: ${p.id}">${p.firstname}</div>
+                        <div class="person-lastname" title="ID: ${p.id}">${p.lastname}</div>
+                        <div class="person-category">${p.category||'-'}</div>
+                        <div class="category-buttons">${CATEGORIES.map(cat=>{
+                            const sel=p.category===cat;
+                            return `<button class="category-btn category-${cat.toLowerCase().replace('/','')} ${sel?'selected':''}" onclick="setCategory(${idx},'${cat}')">${cat}</button>`
+                        }).join('')}</div>
+                    </div>`;
+                } else {
+                    rowHTML = `<div class="person-item" style="grid-template-columns:1fr 120px 1fr;">
+                        <div class="person-firstname" title="ID: ${p.id}">${p.firstname}</div>
+                        <div class="person-category">${Array.isArray(p.category)?(p.category.length>0?p.category.join(', '):'-'):'-'}</div>
+                        <div class="category-buttons">${CATEGORIES.map(cat=>{
+                            const sel=Array.isArray(p.category)?p.category.includes(cat):false;
+                            return `<button class="category-btn category-${cat.toLowerCase().replace('/','')} ${sel?'selected':''}" onclick="setCategory(${idx},'${cat}')">${cat}</button>`
+                        }).join('')}</div>
+                    </div>`;
+                }
+                return rowHTML;
+            }).join('');
+        }
+        function setCategory(i,cat){
+            const list = appData[activeList];
+            if(activeList==='programs'){
+                if(!Array.isArray(list[i].category)) list[i].category=[];
+                const pos=list[i].category.indexOf(cat);
+                if(pos>-1){list[i].category.splice(pos,1);}else{list[i].category.push(cat);}
+            }else{
+                if(list[i].category===cat){list[i].category=null;}else{list[i].category=cat;}
+            }
+            saveToStorage();
+            renderPeopleList();
+            updateProgress();
+            updateChart();
+        }
+        function updateProgress(){
+            const list = appData[activeList];
+            const categorised=list.filter(p=>Array.isArray(p.category)?p.category.length>0:p.category!==null).length;
+            const total=list.length;
+            const pct=total>0?(categorised/total)*100:0;
+            document.getElementById('progress-fill').style.width=pct+'%';
+            document.getElementById('progress-text').textContent=`${categorised} / ${total} (${Math.round(pct)}%)`;
+        }
+        function updateChart(){
+            const renderChart = (list, containerId) => {
+                const counts={'Connect':0,'Win':0,'Build':0,'Train':0,'Send/Multiply':0};
+                list.forEach(p=>{
+                    if(Array.isArray(p.category)){
+                        p.category.forEach(c=>{if(counts[c]!==undefined)counts[c]++;});
+                    }else if(p.category&&counts[p.category]!==undefined){
+                        counts[p.category]++;
+                    }
+                });
+                const max=Math.max(...Object.values(counts),1);
+                const colors={'Connect':'#FF5722','Win':'#2196F3','Build':'#4CAF50','Train':'#FF9800','Send/Multiply':'#9C27B0'};
+                const html = Object.keys(counts).map(cat=>{
+                    const pct=(counts[cat]/max)*100;
+                    return `<div class="chart-bar-wrapper">
+                        <div class="chart-label">${cat}</div>
+                        <div class="chart-bar-bg"><div class="chart-bar-fill" style="background:${colors[cat]};width:${pct}%;"></div></div>
+                        <div class="chart-count">${counts[cat]}</div>
+                    </div>`;
+                }).join('');
+                const container = document.getElementById(containerId);
+                if(container) container.innerHTML = html;
+            };
+            renderChart(appData.people, 'chart-bars-people');
+            renderChart(appData.programs, 'chart-bars-programs');
+        }
+        function switchTab(name){
+            document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+            document.getElementById(name+'-tab').classList.add('active');
+            const listSwitch = document.querySelector('.list-switch-wrapper');
+            if(listSwitch) listSwitch.style.display = name === 'categorise' ? 'inline-grid' : 'none';
+            if(name==='results')updateChart();
+        }
+        function clearData(){
+            if(confirm(`Are you sure you want to clear all ${activeList} data? This cannot be undone.`)){
+                appData[activeList]=[];
+                saveToStorage();
+                renderPeopleList();
+                updateProgress();
+                updateChart();
+            }
+        }
+        function exportData(){
+            const list = appData[activeList];
+            if(list.length===0){alert('No data to export');return;}
+            let csv='ID,Firstname,Lastname,Category\n';
+            list.forEach(p=>{
+                const cStr=Array.isArray(p.category)?p.category.join('; '):(p.category||'');
+                csv+=`${p.id},${p.firstname},${p.lastname},${cStr}\n`;
+            });
+            const blob=new Blob([csv],{type:'text/csv'});
+            const url=URL.createObjectURL(blob);
+            const a=document.createElement('a');
+            a.href=url;
+            a.download=`categorised-${activeList}-`+new Date().toISOString().split('T')[0]+'.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        initTheme();loadFromStorage();
     </script>
 </body>
 </html>
