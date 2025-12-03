@@ -207,7 +207,7 @@
             </div>
             <div id="person-list" class="person-list"></div>
             <div class="csv-note" style="padding:10px 20px; background:#fffbe6; border-top:1px solid #e0e0e0; border-bottom:1px solid #e0e0e0; font-size:13px; color:#5c5c00;">
-                <strong>CSV format:</strong> Required headers: <code>ID, Firstname, Lastname</code>. Optional: <code>Category</code>.<br>
+                <strong>CSV format:</strong> Required headers: <code>ID, Firstname, Lastname</code>. Optional: <code>Category</code>. <a href="#" id="template-link" onclick="downloadTemplate(); return false;" style="margin-left:10px; text-decoration:underline; color:inherit; font-weight:bold;">Download Template CSV</a><br>
                 <strong>Categories:</strong> Use numbers 1-5 (corresponding to your custom labels) or the exact text label. <br>
                 In Programs (Multiple) mode, separate multiple categories with semicolons (e.g., <code>1; 3; 5</code> or <code>Connect; Build</code>).
             </div>
@@ -299,7 +299,11 @@
         function applyTheme(theme){const isDark=theme==='dark';document.body.classList.toggle('dark',isDark);if(isDark){document.getElementById('theme-dark').checked=true;}else{document.getElementById('theme-light').checked=true;}}
         function initTheme(){let theme=localStorage.getItem(THEME_KEY);if(!theme){theme=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}applyTheme(theme);if(window.matchMedia){window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',e=>{if(!localStorage.getItem(THEME_KEY)){applyTheme(e.matches?'dark':'light');}});}}
         function toggleTheme(on){const theme=on?'dark':'light';localStorage.setItem(THEME_KEY,theme);applyTheme(theme);}        
-        function switchList(listType){activeList=listType;localStorage.setItem(MODE_KEY,listType);renderPeopleList();updateProgress();}
+        function updateTemplateLink(){
+            const link = document.getElementById('template-link');
+            if(link) link.textContent = activeList === 'people' ? 'Download People Template CSV' : 'Download Programs Template CSV';
+        }
+        function switchList(listType){activeList=listType;localStorage.setItem(MODE_KEY,listType);renderPeopleList();updateProgress();updateTemplateLink();}
         function loadFromStorage(){
             const stored = localStorage.getItem(STORAGE_KEY);
             const storedMode = localStorage.getItem(MODE_KEY);
@@ -314,6 +318,7 @@
                 activeList = storedMode;
                 document.querySelector(`input[name="list-type"][value="${storedMode}"]`).checked=true;
             }
+            updateTemplateLink();
             if(stored){
                 try{
                     const parsedData = JSON.parse(stored);
@@ -574,6 +579,25 @@
                 renderPeopleList();
                 updateProgress();
                 updateChart();
+            }
+        }
+        function downloadTemplate(){
+            let csvContent = '';
+            if(activeList === 'people'){
+                csvContent = 'ID,Firstname,Lastname,Category\n1,John,Doe,1\n2,Jane,Smith,';
+            } else {
+                csvContent = 'ID,Firstname,Category\n1,Sunday Service,1; 2\n2,Youth Group,';
+            }
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", `${activeList}_template.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
         }
         function exportData(){
